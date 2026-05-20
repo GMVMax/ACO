@@ -1,0 +1,909 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Affiliate Cost Optimization</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#010101;
+    --ink:#f1f1f2;
+    --ink-soft:#a8a8ad;
+    --ink-mute:#6e6e73;
+    --line:rgba(255,255,255,0.08);
+    --card:rgba(255,255,255,0.03);
+    --tt-cyan:#25f4ee;
+    --tt-pink:#fe2c55;
+    --good:#00d68f;
+    --warn:#ffb020;
+    --bad:#ff4d6d;
+    --grad:linear-gradient(92deg,var(--tt-cyan) 0%,#a78bfa 50%,var(--tt-pink) 100%);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:'Inter',-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 28px}
+
+  /* NDA */
+  .nda-band{position:fixed;top:0;left:0;right:0;z-index:60;background:rgba(254,44,85,0.08);border-bottom:1px solid rgba(254,44,85,0.35);backdrop-filter:blur(8px);font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#ffb3c1;padding:8px 16px;text-align:center;font-weight:600}
+  .nda-band b{color:#fff}
+  .wm-text{position:fixed;inset:0;pointer-events:none;z-index:2;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(6,1fr);opacity:0.05;font-weight:800;font-size:14px;letter-spacing:0.3em;color:#fff;transform:rotate(-22deg) scale(1.4);transform-origin:center}
+  .wm-text span{display:flex;align-items:center;justify-content:center;text-align:center}
+
+  section{position:relative;z-index:5;padding:120px 0;border-bottom:1px solid var(--line)}
+  section:first-of-type{padding-top:160px}
+  section:last-of-type{border-bottom:none}
+
+  /* Reveal */
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease, transform .8s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
+  .reveal.delay-1{transition-delay:.08s}
+  .reveal.delay-2{transition-delay:.16s}
+  .reveal.delay-3{transition-delay:.24s}
+  .reveal.delay-4{transition-delay:.32s}
+
+  /* Type */
+  .eyebrow{font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;margin-bottom:18px}
+  h1.hero{font-size:clamp(44px,7vw,92px);line-height:0.98;letter-spacing:-0.03em;font-weight:900;margin:0 0 22px}
+  h2{font-size:clamp(32px,4.4vw,56px);line-height:1.04;letter-spacing:-0.025em;font-weight:800;margin:0 0 16px}
+  h3{font-size:22px;line-height:1.25;letter-spacing:-0.01em;font-weight:700;margin:0 0 10px}
+  p{font-size:17px;line-height:1.6;color:var(--ink-soft);margin:0 0 14px}
+  p.lead{font-size:20px;color:#dcdcdf;line-height:1.55;max-width:880px}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--card);font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:600}
+  .pill .pulse{width:8px;height:8px;border-radius:50%;background:var(--tt-cyan);box-shadow:0 0 12px var(--tt-cyan);animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.1)}}
+
+  .hero-glow{position:absolute;inset:auto 0 -40% 0;height:90vh;background:radial-gradient(60% 60% at 50% 50%,rgba(254,44,85,0.22),transparent 70%),radial-gradient(40% 40% at 70% 30%,rgba(37,244,238,0.16),transparent 70%);filter:blur(20px);z-index:-1}
+
+  .sec-num{font-family:'SF Mono',monospace;font-size:12px;color:var(--ink-mute);letter-spacing:0.2em;margin-bottom:14px}
+
+  /* Cards */
+  .grid{display:grid;gap:18px}
+  .grid-2{grid-template-columns:1fr 1fr}
+  @media (max-width:880px){.grid-2{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;position:relative;overflow:hidden}
+  .card.glow::before{content:"";position:absolute;inset:-1px;border-radius:18px;padding:1px;background:var(--grad);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.6;pointer-events:none}
+  .card .tag{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ink-mute);font-weight:700;margin-bottom:10px}
+
+  /* Scene 1 / Blind spot bars: GMV is the full bar height. Ads + Affiliate are slices inside. */
+  .stackwrap{display:flex;align-items:flex-end;gap:160px;margin-top:60px;flex-wrap:wrap;justify-content:center}
+  .stack{width:140px;text-align:center;position:relative}
+  .stack .lbl{font-size:13px;color:var(--ink-soft);margin-bottom:8px;letter-spacing:0.04em;font-weight:600}
+  .stack .sub-commission{font-size:11px;color:var(--ink-mute);margin-bottom:18px;letter-spacing:0.04em}
+  .stack .gmv-cap{font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--tt-cyan);font-weight:800;margin-bottom:8px}
+  .stack .bar{position:relative;width:100%;height:340px;background:linear-gradient(180deg,#1f2937,#0f172a);border-radius:14px;overflow:visible;border:1px solid var(--line)}
+  .stack .sub{font-size:11px;color:var(--ink-mute);margin-top:14px;letter-spacing:0.04em}
+  .stack .seg{position:absolute;left:0;right:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;color:#fff;transition:height 1.2s cubic-bezier(.2,.7,.2,1), bottom 1.2s cubic-bezier(.2,.7,.2,1), opacity .8s ease;overflow:hidden;line-height:1.15}
+  .stack .seg .seg-name{font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;opacity:0.85}
+  .stack .seg .seg-val{font-size:18px;font-weight:900;letter-spacing:-0.01em;font-variant-numeric:tabular-nums}
+  .seg.ads{background:linear-gradient(180deg,#0891b2,#06b6d4);color:#001318;border-radius:0 0 13px 13px}
+  .seg.aff{background:linear-gradient(180deg,#fe2c55,#b91c4d);color:#fff}
+  /* For tiny affiliate slices, the value sits to the LEFT of the slice with a leader line into the slice.
+     Inline 'bottom' on the element should equal the slice midpoint minus half the leader's own height
+     so the leader-line lands at the slice center. We give the leader a fixed height so callers can do that math. */
+  .seg.aff.tiny{overflow:visible}
+  .seg.aff.tiny .seg-name,.seg.aff.tiny .seg-val{display:none}
+  .aff-leader{position:absolute;display:flex;align-items:center;gap:6px;opacity:0;transition:opacity .8s ease .3s;pointer-events:none;right:calc(100% - 8px);white-space:nowrap;flex-direction:row-reverse;height:28px}
+  .aff-leader.show{opacity:1}
+  .aff-leader .leader-line{width:34px;height:1px;background:rgba(254,44,85,0.85);position:relative;flex-shrink:0}
+  .aff-leader .leader-line::after{content:"";position:absolute;right:-3px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--tt-pink);transform:translateY(-50%);box-shadow:0 0 6px rgba(254,44,85,0.6)}
+  .aff-leader .leader-text{display:flex;flex-direction:column;line-height:1.15;align-items:flex-end}
+  .aff-leader .leader-text .nm{font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#ffb6c2}
+  .aff-leader .leader-text .vl{font-size:14px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums}
+
+  .stack-legend{display:flex;flex-wrap:wrap;gap:22px;margin-top:60px;justify-content:center}
+  .legend-dot{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft)}
+  .legend-dot i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .legend-dot.off-model{color:var(--ink-soft)}
+  .legend-dot.off-model .lbl-text{color:var(--ink-soft)}
+  .legend-dot.off-model .ribbon{font-size:10px;font-weight:800;letter-spacing:0.16em;text-transform:uppercase;background:rgba(255,77,109,0.15);color:var(--bad);padding:2px 7px;border-radius:4px;margin-left:4px;border:1px solid rgba(255,77,109,0.4)}
+
+  /* Scene 3 formulas */
+  .math-row{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;margin-top:30px}
+  @media (max-width:880px){.math-row{grid-template-columns:1fr}}
+  .formula-box{padding:28px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));text-align:center}
+  .formula-box .h{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);font-weight:700;margin-bottom:14px}
+  .formula-box .name{font-size:14px;font-weight:700;margin-bottom:14px;color:#fff}
+  .formula-box .eq{font-family:'SF Mono','Menlo',monospace;font-size:clamp(16px,2.2vw,22px);line-height:1.5}
+  .formula-box .eq .num{padding:5px 10px;border-radius:7px;background:rgba(255,255,255,0.06);display:inline-block}
+  .formula-box .eq .ads{color:var(--tt-cyan)}
+  .formula-box .eq .aff{color:var(--tt-pink)}
+  .formula-box .eq .aff.fade{color:#3a3a3f;text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.25)}
+  .formula-box.before{opacity:.85}
+  .formula-box.after{border-color:rgba(254,44,85,0.35);box-shadow:0 0 0 1px rgba(254,44,85,0.15), 0 20px 60px rgba(254,44,85,0.08)}
+  .arrow{display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--ink-mute)}
+  @media (max-width:880px){.arrow{transform:rotate(90deg);padding:6px 0}}
+
+  /* Reusable slide toggle (used in Scene 3 and Scene 4) */
+  .slide-toggle{display:inline-flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .slide-toggle .lbl{font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);transition:color .3s}
+  .slide-toggle .lbl.active{color:#fff}
+  .slide-toggle .lbl.left.active{color:#fff}
+  .slide-toggle .lbl.right.active{color:var(--tt-cyan)}
+  .slide-toggle .switch{position:relative;width:78px;height:38px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--line);cursor:pointer;transition:background .4s, border-color .4s, box-shadow .4s;flex-shrink:0;animation:togglePulse 3.2s ease-in-out infinite}
+  .slide-toggle .switch::before{content:"";position:absolute;top:3px;left:3px;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.45);transition:transform .35s cubic-bezier(.4,1.4,.6,1), background .35s, box-shadow .35s;animation:knobPulse 3.2s ease-in-out infinite}
+  .slide-toggle.on .switch{background:rgba(37,244,238,0.12);border-color:rgba(37,244,238,0.4);box-shadow:none;animation:none}
+  .slide-toggle.on .switch::before{transform:translateX(40px);background:#fff;box-shadow:0 0 14px rgba(37,244,238,0.55), 0 0 28px rgba(37,244,238,0.2);animation:none}
+  @keyframes togglePulse{0%,100%{box-shadow:0 0 0 0 rgba(37,244,238,0.22)}50%{box-shadow:0 0 0 4px rgba(37,244,238,0)}}
+  @keyframes knobPulse{0%,100%{box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 0 0 0 rgba(37,244,238,0.22)}50%{box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 0 6px 2px rgba(37,244,238,0.18)}}
+  .slide-toggle .key{font-size:11px;color:var(--ink-mute);font-weight:600;letter-spacing:0.16em;text-transform:uppercase}
+
+  .signal-banner{margin-top:24px;padding:14px 18px;border:1px dashed var(--line);border-radius:12px;background:var(--card);font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .signal-banner .lit-dot{width:10px;height:10px;border-radius:50%;background:var(--good);box-shadow:0 0 12px var(--good);flex-shrink:0}
+  .signal-banner b{color:#fff;font-weight:700}
+
+  /* Scene 3: side-by-side ranked columns */
+  .rank-grid{display:grid;grid-template-columns:minmax(0,520px);gap:24px;margin-top:30px;justify-content:center;transition:grid-template-columns 1.8s cubic-bezier(.25,.8,.25,1), justify-content 1.2s ease}
+  .rank-grid.aco-on{grid-template-columns:minmax(0,520px) minmax(0,520px);justify-content:center}
+  @media (max-width:880px){.rank-grid, .rank-grid.aco-on{grid-template-columns:1fr}}
+  .rank-col{padding:24px 20px 28px;border:1px solid var(--line);border-radius:18px;background:var(--card);transition:border-color 1s, background 1s, opacity 1.2s ease, transform 1.6s cubic-bezier(.25,.8,.25,1)}
+  .rank-col.is-right{opacity:0;transform:translateX(40px) scale(0.96);pointer-events:none}
+  .rank-grid.aco-on .rank-col.is-right{opacity:1;transform:translateX(0) scale(1);pointer-events:auto;transition-delay:.4s}
+  .rank-col.live-after{border-color:rgba(0,214,143,0.35);background:linear-gradient(180deg,rgba(0,214,143,0.04),rgba(37,244,238,0.04))}
+  .rank-col .col-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px}
+  .rank-col .col-title{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);font-weight:800}
+  .rank-col .col-signal{font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+  .rank-col .col-signal::before{content:"";width:8px;height:8px;border-radius:50%}
+  .rank-col.is-gmv .col-signal::before{background:var(--good);box-shadow:0 0 10px var(--good)}
+  .rank-col.is-profit .col-signal::before{background:var(--tt-pink);box-shadow:0 0 10px var(--tt-pink)}
+
+  .rank-list{position:relative;height:642px;transition:height 1.2s ease}
+  .rank-col.is-profit .rank-list{height:642px}
+  .crt{position:absolute;left:0;right:0;background:rgba(255,255,255,0.04);border:1px solid var(--line);border-radius:14px;padding:14px 16px;transition:top 3.6s cubic-bezier(.25,.8,.25,1), border-color 1.6s, box-shadow 1.6s, background 1.6s}
+  /* Fixed-height cards so layout math is identical in both columns, regardless of which extra rows are visible. */
+  .rank-col.is-gmv .crt{height:200px}
+  .rank-col.is-profit .crt{height:200px}
+  /* Color code per creator so the same card is identifiable across both columns */
+  .crt[data-id="A"]{border-color:rgba(37,244,238,0.55);background:linear-gradient(180deg,rgba(37,244,238,0.12),rgba(37,244,238,0.04));box-shadow:inset 3px 0 0 rgba(37,244,238,0.85)}
+  .crt[data-id="A"] .av{background:linear-gradient(135deg,rgba(37,244,238,0.7),rgba(37,244,238,0.2));border-color:rgba(37,244,238,0.85);color:#001a1c}
+  .crt[data-id="B"]{border-color:rgba(255,176,32,0.55);background:linear-gradient(180deg,rgba(255,176,32,0.10),rgba(255,176,32,0.03));box-shadow:inset 3px 0 0 rgba(255,176,32,0.85)}
+  .crt[data-id="B"] .av{background:linear-gradient(135deg,rgba(255,176,32,0.7),rgba(255,176,32,0.2));border-color:rgba(255,176,32,0.85);color:#1a0e00}
+  .crt[data-id="S"]{border-color:rgba(167,139,250,0.55);background:linear-gradient(180deg,rgba(167,139,250,0.12),rgba(167,139,250,0.04));box-shadow:inset 3px 0 0 rgba(167,139,250,0.85)}
+  .crt[data-id="S"] .av{background:linear-gradient(135deg,rgba(167,139,250,0.7),rgba(167,139,250,0.2));border-color:rgba(167,139,250,0.85);color:#0e0420}
+  .crt .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .crt .pos{flex-shrink:0;width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,0.08);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:14px;transition:background .4s, color .4s}
+  .crt .av{flex-shrink:0;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,rgba(37,244,238,0.2),rgba(254,44,85,0.2));border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px}
+  .crt h4{margin:0;font-size:14px;font-weight:700}
+  .crt .sub{font-size:10px;color:var(--ink-mute);letter-spacing:0.04em;text-transform:uppercase;font-weight:600;margin-top:2px}
+  .crt .arrow{margin-left:auto;font-size:13px;font-weight:800;opacity:0;transition:opacity .5s}
+  .crt .arrow.up{color:var(--good);opacity:1}
+  .crt .arrow.down{color:var(--bad);opacity:1}
+  .crt .arrow.flat{color:var(--ink-mute);opacity:1}
+
+  /* Single signal bar inside each card. Color depends on column type. */
+  .sig{transition:opacity 1.2s}
+  .sig .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+  .sig .head .name{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;color:var(--ink-soft)}
+  .sig .head .val{font-size:13px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+  .sig .track{height:7px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;position:relative}
+  .sig .fill{height:100%;border-radius:6px;transition:width 2s cubic-bezier(.2,.7,.2,1)}
+  .rank-col.is-gmv .sig .fill{background:linear-gradient(90deg,#00d68f,#25f4ee);box-shadow:0 0 10px rgba(0,214,143,0.35)}
+  .rank-col.is-profit .sig .fill{background:linear-gradient(90deg,#fe2c55,#a78bfa);box-shadow:0 0 10px rgba(254,44,85,0.35)}
+  /* Ghost signal: shown only in profit mode for the right column. Greyed-out reference of the old GMV signal. */
+  .sig-ghost{margin-top:8px;opacity:0;max-height:0;overflow:hidden;transition:opacity 1s ease, max-height 1s ease}
+  .rank-col.is-profit .sig-ghost{opacity:0.55;max-height:48px}
+  .sig-ghost .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+  .sig-ghost .head .name{font-size:9px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;color:var(--ink-mute);text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.18)}
+  .sig-ghost .head .val{font-size:11px;font-weight:700;color:var(--ink-mute);font-variant-numeric:tabular-nums}
+  .sig-ghost .track{height:4px;background:rgba(255,255,255,0.04);border-radius:4px;overflow:hidden}
+  .sig-ghost .fill{height:100%;border-radius:4px;background:rgba(255,255,255,0.18);transition:width 2s cubic-bezier(.2,.7,.2,1)}
+  /* Formula chip: shown only in profit mode. Subtle reduce-by phrasing, not red. */
+  .formula-chip{display:flex;align-items:center;gap:6px;margin-top:10px;opacity:0;max-height:0;overflow:hidden;transition:opacity .9s ease .25s, max-height .9s ease .25s;font-size:10.5px;font-weight:600;color:var(--ink-soft);background:rgba(255,255,255,0.025);border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-variant-numeric:tabular-nums;justify-content:center;letter-spacing:0.02em}
+  .rank-col.is-profit .formula-chip{opacity:1;max-height:36px}
+  .formula-chip .gpm-from{color:var(--ink-soft)}
+  .formula-chip .arr-down{display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--ink-soft);margin:0 1px;opacity:0.7}
+  .formula-chip .pct{color:#cfcfd3;font-weight:700}
+  .formula-chip .eq-sign{opacity:0.4;color:var(--ink-mute);margin:0 2px}
+  .formula-chip .gpm-to{color:#fff;font-weight:800}
+  /* Faded commission row in Before card so heights match After. */
+  .pre-comm{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);display:flex;justify-content:space-between;align-items:center;gap:8px;opacity:0.85;font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;font-weight:700;color:var(--ink-soft)}
+  .pre-comm .pct-val{color:#fff;font-family:'SF Mono','Menlo',monospace;font-weight:800;letter-spacing:0;text-transform:none;font-variant-numeric:tabular-nums}
+  .pre-comm .note{font-style:italic;font-weight:600;text-transform:none;letter-spacing:0.02em;color:var(--ink-mute)}
+
+  /* Winner state: keep the per-creator color identity, just add a green outer glow + ribbon. */
+  .crt.win{box-shadow:0 0 0 2px rgba(0,214,143,0.55), 0 12px 36px rgba(0,214,143,0.18)}
+  .crt.win .pos{background:var(--good);color:#001a10}
+  .winner-tag{position:absolute;top:-10px;right:14px;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;font-weight:800;padding:4px 9px;border-radius:999px;background:var(--good);color:#001a10;opacity:0;transform:translateY(-4px);transition:all .6s .8s}
+  .crt.win .winner-tag{opacity:1;transform:none}
+
+  /* Scene 4: punchline + single stack with toggle + receipts */
+  .punch{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-top:8px}
+  .punch .num{font-size:clamp(28px,3.6vw,44px);font-weight:900;line-height:1;letter-spacing:-0.03em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+  .punch .lbl{font-size:16px;font-weight:700;color:#dcdcdf}
+  .punch .sml{display:block;font-size:13px;color:var(--ink-mute);font-weight:500;margin-top:2px}
+
+  .ex-shell{margin-top:36px;padding:36px 28px 32px;border:1px solid var(--line);border-radius:20px;background:var(--card);transition:border-color .6s, background .6s}
+  .ex-shell.aco-on{border-color:rgba(0,214,143,0.4);background:linear-gradient(180deg,rgba(0,214,143,0.04),rgba(37,244,238,0.04))}
+  .ex-shell .ex-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;margin-bottom:22px}
+  .ex-shell .stage-title{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);font-weight:800}
+
+  /* Two-stack layout: Before always present. After hidden until toggle on. */
+  .ex-stage{display:flex;justify-content:center;align-items:flex-start;gap:0;padding:18px 8px 8px}
+  @media (max-width:880px){.ex-stage{flex-direction:column;align-items:center}}
+
+  .ex-pane{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;width:100%;max-width:440px;flex-shrink:0}
+  @media (max-width:1080px){.ex-pane{grid-template-columns:auto 1fr;gap:20px;max-width:340px}}
+  .ex-pane .pane-title{grid-column:1 / -1;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);font-weight:800;text-align:center;margin-bottom:8px}
+  /* Before pane stays centered when alone; slides left smoothly when After comes in. */
+  .ex-pane.before{transition:transform .8s cubic-bezier(.25,.8,.25,1)}
+  .ex-shell.aco-on .ex-pane.before{transform:translateX(0)}
+  /* After pane: width animates from 0 to natural width. Inner content fades in slightly delayed. */
+  .ex-pane.after{max-width:0;width:0;overflow:hidden;opacity:0;margin-left:0;transition:max-width .8s cubic-bezier(.25,.8,.25,1), width .8s cubic-bezier(.25,.8,.25,1), margin-left .8s cubic-bezier(.25,.8,.25,1), opacity .5s ease;pointer-events:none}
+  .ex-shell.aco-on .ex-pane.after{max-width:440px;width:100%;margin-left:32px;opacity:1;pointer-events:auto;transition:max-width .8s cubic-bezier(.25,.8,.25,1), width .8s cubic-bezier(.25,.8,.25,1), margin-left .8s cubic-bezier(.25,.8,.25,1), opacity .5s ease .25s}
+  @media (max-width:1080px){.ex-shell.aco-on .ex-pane.after{max-width:340px}}
+  @media (max-width:880px){.ex-shell.aco-on .ex-pane.after{margin-left:0;margin-top:24px}}
+  .ex-pane.after .pane-title{color:#a4f0ce}
+
+  .ex-bar{position:relative;width:150px;height:340px;background:rgba(255,255,255,0.03);border-radius:14px;border:1px solid var(--line);overflow:visible;transform-origin:bottom;transition:transform 1.4s cubic-bezier(.2,.7,.2,1)}
+  .ex-pane.after .ex-bar{transform:scaleY(1.2)}
+  .ex-bar .seg{position:absolute;left:0;right:0;transition:height 1.4s cubic-bezier(.2,.7,.2,1), bottom 1.4s cubic-bezier(.2,.7,.2,1), background 1.2s ease}
+  .ex-bar .seg.ads{background:linear-gradient(180deg,#0891b2,#06b6d4)}
+  .ex-bar .seg.aff{background:linear-gradient(180deg,#fe2c55,#b91c4d)}
+  .ex-bar .seg.profit{background:linear-gradient(180deg,#3b8a6a,#2a6b52)}
+  .ex-pane.after .ex-bar .seg.profit{background:linear-gradient(180deg,#00d68f,#059669);box-shadow:inset 0 0 30px rgba(0,214,143,0.2)}
+  .ex-bar .total-tag{position:absolute;top:-32px;left:0;right:0;text-align:center;font-size:13px;letter-spacing:0.1em;color:#fff;font-weight:800}
+  .ex-pane.after .ex-bar .total-tag{color:#a4f0ce}
+
+  /* Outside labels with leader lines so text never sits inside the bars */
+  .ex-labels{position:relative;height:340px;width:100%;max-width:230px}
+  .ex-label{position:absolute;left:0;display:flex;align-items:center;gap:12px;font-weight:700;color:#fff;transition:bottom 1.4s cubic-bezier(.2,.7,.2,1)}
+  .ex-label .swatch{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+  .ex-label .swatch.ads{background:linear-gradient(180deg,#0891b2,#06b6d4)}
+  .ex-label .swatch.aff{background:linear-gradient(180deg,#fe2c55,#b91c4d)}
+  .ex-label .swatch.profit{background:linear-gradient(180deg,#3b8a6a,#2a6b52)}
+  .ex-pane.after .ex-label .swatch.profit{background:linear-gradient(180deg,#00d68f,#059669)}
+  .ex-label .name{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  .ex-label .val{font-size:18px;color:#fff;font-weight:900;font-variant-numeric:tabular-nums}
+  .ex-pane.after .ex-label.profit-row .val{color:var(--good)}
+
+  .target-row{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:24px}
+  .target-chip{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border:1px dashed var(--line);border-radius:999px;font-size:12px;color:var(--ink-soft);font-weight:600;letter-spacing:0.04em;background:var(--card)}
+  .target-chip b{color:#fff;font-weight:800}
+  .target-chip.aff{display:none}
+  .ex-shell.aco-on .target-chip.aff{display:inline-flex;border-color:rgba(0,214,143,0.3);background:rgba(0,214,143,0.06);color:#a4f0ce}
+
+  .receipt{margin-top:24px;padding:28px;border:1px solid var(--line);border-radius:20px;background:var(--card);display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  @media (max-width:880px){.receipt{grid-template-columns:1fr}}
+  .receipt .row{position:relative}
+  .receipt .row .k{font-size:12px;color:var(--ink-soft);font-weight:700;letter-spacing:0.06em;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;text-transform:uppercase}
+  .receipt .row .k .delta{font-size:11px;font-weight:700;opacity:0;transition:opacity .5s}
+  .receipt .row .k .delta.show{opacity:1}
+  .receipt .row .k .delta.up{color:var(--good)}
+  .receipt .row .k .delta.flat{color:var(--ink-mute)}
+  .receipt .row .vals{display:flex;align-items:baseline;gap:14px;font-variant-numeric:tabular-nums}
+  .receipt .row .from{font-size:18px;font-weight:600;color:var(--ink-mute);text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.2);opacity:0;transition:opacity .5s}
+  .receipt .row .from.show{opacity:1}
+  .receipt .row .to{font-size:32px;font-weight:900;letter-spacing:-0.02em;color:#fff;transition:color .6s}
+  .receipt .row.highlight .to{color:#fff;transition:color .6s}
+  .ex-shell.aco-on ~ .receipt .row.highlight .to{color:var(--good)}
+  .receipt .row .progress{height:4px;background:rgba(255,255,255,0.06);border-radius:4px;margin-top:10px;overflow:hidden}
+  .receipt .row .progress .fill{height:100%;width:0;background:var(--grad);border-radius:4px;transition:width 1.6s cubic-bezier(.2,.7,.2,1)}
+
+  /* Scene 6 vs */
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:880px){.vs{grid-template-columns:1fr}}
+  .vs .col{padding:26px;border-radius:18px;border:1px solid var(--line);background:var(--card)}
+  .vs .col.next{background:linear-gradient(180deg,rgba(37,244,238,0.05),rgba(254,44,85,0.05))}
+  .vs h4{font-size:13px;letter-spacing:0.22em;text-transform:uppercase;font-weight:800;color:var(--ink-soft);margin:0 0 14px}
+  .vs ul{margin:0;padding:0;list-style:none}
+  .vs li{padding:11px 0;border-top:1px dashed var(--line);font-size:15px;color:#dcdcdf;display:flex;gap:10px;align-items:flex-start}
+  .vs li:first-child{border-top:none}
+  .vs li .ico{flex-shrink:0;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:3px}
+  .vs li .ico.x{background:rgba(255,77,109,0.15);color:var(--bad)}
+  .vs li .ico.y{background:rgba(0,214,143,0.15);color:var(--good)}
+
+  footer{padding:60px 0 80px;text-align:center;color:var(--ink-mute);font-size:12px;letter-spacing:0.06em}
+  footer .bar{height:2px;background:var(--grad);width:80px;margin:0 auto 20px;border-radius:2px;opacity:.6}
+</style>
+</head>
+<body>
+
+<div class="nda-band"><b>1:1 NDA</b> &nbsp;·&nbsp; No Screenshot &nbsp;·&nbsp; No Sharing &nbsp;·&nbsp; Internal Privileged &amp; Confidential</div>
+
+<div class="wm-text" aria-hidden="true">
+  <span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span>
+  <span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span>
+  <span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span>
+  <span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span>
+  <span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span>
+  <span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span><span>NDA · INTERNAL</span>
+</div>
+
+<!-- 1. HOOK -->
+<section>
+  <div class="hero-glow"></div>
+  <div class="wrap">
+    <div class="reveal"><span class="pill"><span class="pulse"></span>GMV Max Pro · Affiliate Cost Optimisation · SEA</span></div>
+    <h1 class="hero reveal delay-1" style="margin-top:14px">GMV is up.<br/><span class="grad">So why is profit flat?</span></h1>
+    <p class="lead reveal delay-2">Today's ranking sees Ads cost but not Affiliate commission, even though both come out of the seller's pocket. Affiliate Cost Optimization closes that blind spot — the system now optimizes for profit, not just GMV.</p>
+  </div>
+</section>
+
+<!-- 2. THE BLIND SPOT -->
+<section>
+  <div class="wrap">
+    <div class="sec-num reveal">01 / THE BLIND SPOT</div>
+    <h2 class="reveal delay-1">Without ACO, the system sees one cost.<br/>The seller still pays two.</h2>
+    <p class="lead reveal delay-2">Ads cost is in the ranking equation. Affiliate commission is not. For shops with high commission rates, that is a real chunk of money the system never weighs.</p>
+
+    <div class="grid grid-2 reveal delay-3" style="margin-top:36px;align-items:center">
+      <div>
+        <div class="stackwrap">
+          <!-- Creator A: high commission. 20-unit affiliate slice sits on top of 20-unit Ads slice. -->
+          <div class="stack">
+            <div class="lbl">Creator A</div>
+            <div class="sub-commission">20% commission</div>
+            <div class="gmv-cap">GMV $100</div>
+            <div class="bar" id="stackA">
+              <div class="seg ads" style="bottom:0;height:20%"><span class="seg-name">Ads cost</span><span class="seg-val">$20</span></div>
+              <div class="seg aff" id="affA" style="bottom:20%;height:20%"><span class="seg-name">Affiliate cost</span><span class="seg-val">$20</span></div>
+            </div>
+            <div class="sub">Total cost to seller: $40</div>
+          </div>
+
+          <!-- Creator B: low commission. Same Ads slice. Tiny 3-unit affiliate slice with leader-line out to value. -->
+          <div class="stack">
+            <div class="lbl">Creator B</div>
+            <div class="sub-commission">3% commission</div>
+            <div class="gmv-cap">GMV $100</div>
+            <div class="bar" id="stackB">
+              <div class="seg ads" style="bottom:0;height:20%"><span class="seg-name">Ads cost</span><span class="seg-val">$20</span></div>
+              <div class="seg aff tiny" id="affB" style="bottom:20%;height:3%"></div>
+              <div class="aff-leader" id="affLeaderB" style="bottom:calc(21.5% - 14px)">
+                <span class="leader-line"></span>
+                <span class="leader-text"><span class="nm">Affiliate cost</span><span class="vl">$3</span></span>
+              </div>
+            </div>
+            <div class="sub">Total cost to seller: $23</div>
+          </div>
+        </div>
+        <div class="stack-legend">
+          <span class="legend-dot"><i style="background:#06b6d4"></i>Ads cost · in the model</span>
+          <span class="legend-dot off-model"><i style="background:#fe2c55"></i><span class="lbl-text">Affiliate cost</span><span class="ribbon">Not in the model</span></span>
+          <span class="legend-dot"><i style="background:linear-gradient(180deg,#1f2937,#0f172a);border:1px solid var(--line)"></i>GMV (full bar)</span>
+        </div>
+      </div>
+      <div>
+        <div class="card glow">
+          <div class="tag">In plain terms</div>
+          <h3>Both creatives drive the same GMV. A pays $17 more in commission than B. The system only looks at Ads cost, so the two creatives look identical to it.</h3>
+          <p>That is the gap ACO closes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 3. THE MATH (merged) -->
+<section>
+  <div class="wrap">
+    <div class="sec-num reveal">02 / THE MATH</div>
+    <h2 class="reveal delay-1">From <span style="color:var(--tt-cyan)">ROI2</span> to <span class="grad">Affiliate Inclusive ROI2</span>.</h2>
+    <p class="lead reveal delay-2">Same numerator. Bigger denominator. The system now ranks on the full cost of the sale.</p>
+
+    <div class="math-row reveal delay-3">
+      <div class="formula-box before">
+        <div class="h">Today</div>
+        <div class="name">ROI2</div>
+        <div class="eq">
+          <span class="num">GMV</span>
+          <span style="opacity:.5"> &nbsp;÷&nbsp; </span>
+          <span class="ads">Ads Cost</span>
+          <span class="aff fade"> &nbsp;+ Affiliate Cost</span>
+        </div>
+      </div>
+      <div class="arrow">→</div>
+      <div class="formula-box after">
+        <div class="h">With ACO</div>
+        <div class="name">Affiliate Inclusive ROI2</div>
+        <div class="eq">
+          <span class="num">GMV</span>
+          <span style="opacity:.5"> &nbsp;÷&nbsp; </span>
+          <span>(<span class="ads">Ads Cost</span> + <span class="aff">Affiliate Cost</span>)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. RANKING (two columns side by side, slide toggle drives right column) -->
+<section>
+  <div class="wrap">
+    <div class="sec-num reveal">03 / HOW RANKING CHANGES</div>
+    <h2 class="reveal delay-1">Creative Ranking in ACO.<br/><span class="grad">The order changes once commission is in the math.</span></h2>
+    <p class="lead reveal delay-2">Today, ranking uses GPM alone (GMV per 1,000 impressions). Slide the toggle to bring in the ACO column — it ranks on GPM after commission.</p>
+
+    <div class="reveal delay-3" style="margin-top:30px">
+      <div class="slide-toggle" id="rankToggle">
+        <span class="key">Ranking by</span>
+        <span class="lbl left active" id="lblBefore">GPM</span>
+        <span class="switch" id="rankSwitch" role="switch" aria-checked="false" tabindex="0"></span>
+        <span class="lbl right" id="lblAfter">GPM after commission</span>
+      </div>
+    </div>
+
+    <div class="signal-banner reveal delay-3">
+      <span class="lit-dot"></span>
+      <span>Each card shows its ranking signal. Cards reorder by that number. Currently ranking by <b id="activeName">GPM</b>.</span>
+    </div>
+
+    <div class="rank-grid reveal delay-4" id="rankGrid">
+      <!-- LEFT column: always GPM -->
+      <div class="rank-col is-gmv" id="colLeft">
+        <div class="col-head">
+          <span class="col-title">Before · today</span>
+          <span class="col-signal">GPM</span>
+        </div>
+        <div class="rank-list" id="listLeft">
+          <div class="crt" data-id="A">
+            <span class="winner-tag">Top of the queue</span>
+            <div class="top">
+              <div class="pos">1</div><div class="av">A</div>
+              <div><h4>Creator A</h4><div class="sub">Affiliate · 25% commission</div></div>
+              <div class="arrow"></div>
+            </div>
+            <div class="sig"><div class="head"><span class="name">GPM</span><span class="val">$100</span></div><div class="track"><div class="fill" style="width:100%"></div></div></div>
+            <div class="pre-comm"><span>Commission rate <span class="pct-val">25%</span></span><span class="note">not in ranking</span></div>
+          </div>
+          <div class="crt" data-id="B">
+            <span class="winner-tag">Top of the queue</span>
+            <div class="top">
+              <div class="pos">2</div><div class="av">B</div>
+              <div><h4>Creator B</h4><div class="sub">Affiliate · 8% commission</div></div>
+              <div class="arrow"></div>
+            </div>
+            <div class="sig"><div class="head"><span class="name">GPM</span><span class="val">$88</span></div><div class="track"><div class="fill" style="width:88%"></div></div></div>
+            <div class="pre-comm"><span>Commission rate <span class="pct-val">8%</span></span><span class="note">not in ranking</span></div>
+          </div>
+          <div class="crt" data-id="S">
+            <span class="winner-tag">Top of the queue</span>
+            <div class="top">
+              <div class="pos">3</div><div class="av">S</div>
+              <div><h4>Self owned</h4><div class="sub">Shop creative · 0% commission</div></div>
+              <div class="arrow"></div>
+            </div>
+            <div class="sig"><div class="head"><span class="name">GPM</span><span class="val">$78</span></div><div class="track"><div class="fill" style="width:78%"></div></div></div>
+            <div class="pre-comm"><span>Commission rate <span class="pct-val">0%</span></span><span class="note">not in ranking</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT column: switches between GPM and GPM after commission -->
+      <div class="rank-col is-gmv is-right" id="colRight">
+        <div class="col-head">
+          <span class="col-title" id="rightTitle">Same column · GPM</span>
+          <span class="col-signal" id="rightSignal">GPM</span>
+        </div>
+        <div class="rank-list" id="listRight">
+          <div class="crt" data-id="A">
+            <span class="winner-tag">Top of the queue</span>
+            <div class="top">
+              <div class="pos">1</div><div class="av">A</div>
+              <div><h4>Creator A</h4><div class="sub">Affiliate · 25% commission</div></div>
+              <div class="arrow"></div>
+            </div>
+            <div class="sig"><div class="head"><span class="name" id="rA-name">GPM</span><span class="val" id="rA-val">$100</span></div><div class="track"><div class="fill" id="rA-fill" style="width:100%"></div></div></div>
+            <div class="sig-ghost"><div class="head"><span class="name">GPM</span><span class="val">$100</span></div><div class="track"><div class="fill" style="width:100%"></div></div></div>
+            <div class="formula-chip"><span class="gpm-from">$100</span><span>reduced by</span><span class="pct">25%</span><span class="arr-down"></span><span class="eq-sign">→</span><span class="gpm-to">$75</span></div>
+          </div>
+          <div class="crt" data-id="B">
+            <span class="winner-tag">Top of the queue</span>
+            <div class="top">
+              <div class="pos">2</div><div class="av">B</div>
+              <div><h4>Creator B</h4><div class="sub">Affiliate · 8% commission</div></div>
+              <div class="arrow"></div>
+            </div>
+            <div class="sig"><div class="head"><span class="name" id="rB-name">GPM</span><span class="val" id="rB-val">$88</span></div><div class="track"><div class="fill" id="rB-fill" style="width:88%"></div></div></div>
+            <div class="sig-ghost"><div class="head"><span class="name">GPM</span><span class="val">$88</span></div><div class="track"><div class="fill" style="width:88%"></div></div></div>
+            <div class="formula-chip"><span class="gpm-from">$88</span><span>reduced by</span><span class="pct">8%</span><span class="arr-down"></span><span class="eq-sign">→</span><span class="gpm-to">$81</span></div>
+          </div>
+          <div class="crt" data-id="S">
+            <span class="winner-tag">Top of the queue</span>
+            <div class="top">
+              <div class="pos">3</div><div class="av">S</div>
+              <div><h4>Self owned</h4><div class="sub">Shop creative · 0% commission</div></div>
+              <div class="arrow"></div>
+            </div>
+            <div class="sig"><div class="head"><span class="name" id="rS-name">GPM</span><span class="val" id="rS-val">$78</span></div><div class="track"><div class="fill" id="rS-fill" style="width:78%"></div></div></div>
+            <div class="sig-ghost"><div class="head"><span class="name">GPM</span><span class="val">$78</span></div><div class="track"><div class="fill" style="width:78%"></div></div></div>
+            <div class="formula-chip"><span class="gpm-from">$78</span><span>reduced by</span><span class="pct">0%</span><span class="arr-down" style="opacity:0.25"></span><span class="eq-sign">→</span><span class="gpm-to">$78</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. WORKED EXAMPLE -->
+<section>
+  <div class="wrap">
+    <div class="sec-num reveal">04 / WORKED EXAMPLE</div>
+    <h2 class="reveal delay-1">Same Target ROI2. <span class="grad">More profit.</span></h2>
+
+    <div class="punch reveal delay-2" id="punchBlock">
+      <div>
+        <div class="num"><span id="punchNum">+0</span><span style="font-size:0.5em">pts</span></div>
+        <div class="lbl">Net profit margin lift<span class="sml">From 70% to 72% on the same Target ROI2 of 5</span></div>
+      </div>
+    </div>
+
+    <div class="reveal delay-3" style="margin-top:30px">
+      <div class="slide-toggle" id="acoToggle">
+        <span class="key">View</span>
+        <span class="lbl left active" id="acoLblBefore">Before</span>
+        <span class="switch" id="acoSwitch" role="switch" aria-checked="false" tabindex="0"></span>
+        <span class="lbl right" id="acoLblAfter">With ACO</span>
+      </div>
+    </div>
+
+    <div class="ex-shell reveal delay-3" id="exShell">
+      <div class="ex-head">
+        <span class="stage-title" id="exTitle">Today · ranks on GMV signal</span>
+        <span class="target-chip">Target ROI2 stays at <b>5</b></span>
+      </div>
+
+      <div class="ex-stage">
+        <!-- Before pane (always visible) -->
+        <div class="ex-pane before">
+          <div class="pane-title">Before</div>
+          <div class="ex-bar" id="exBarB">
+            <div class="total-tag">GMV 100</div>
+            <div class="seg ads" style="bottom:0;height:20%"></div>
+            <div class="seg aff" style="bottom:20%;height:10%"></div>
+            <div class="seg profit" style="bottom:30%;height:70%"></div>
+          </div>
+          <div class="ex-labels">
+            <div class="ex-label profit-row" style="bottom:calc(65% - 14px)"><span class="swatch profit"></span><span><span class="name">Profit</span><br/><span class="val">70 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(70%)</span></span></span></div>
+            <div class="ex-label" style="bottom:calc(25% - 14px)"><span class="swatch aff"></span><span><span class="name">Affiliate cost</span><br/><span class="val">10 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(10%)</span></span></span></div>
+            <div class="ex-label" style="bottom:calc(10% - 14px)"><span class="swatch ads"></span><span><span class="name">Ads cost</span><br/><span class="val">20 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(20%)</span></span></span></div>
+          </div>
+        </div>
+
+        <!-- After pane (revealed when toggle on) -->
+        <div class="ex-pane after">
+          <div class="pane-title">With ACO</div>
+          <div class="ex-bar" id="exBarA">
+            <div class="total-tag">GMV 120</div>
+            <div class="seg ads" style="bottom:0;height:20%"></div>
+            <div class="seg aff" style="bottom:20%;height:8.3%"></div>
+            <div class="seg profit" style="bottom:28.3%;height:71.7%"></div>
+          </div>
+          <div class="ex-labels">
+            <div class="ex-label profit-row" id="lblProfitA" style="bottom:calc(64.2% - 14px)"><span class="swatch profit"></span><span><span class="name">Profit</span><br/><span class="val" id="vProfitSeg">86 <span style="font-size:0.7em;font-weight:700;color:#a4f0ce">(71.7%)</span></span></span></div>
+            <div class="ex-label" id="lblAffA" style="bottom:calc(24.2% - 14px)"><span class="swatch aff"></span><span><span class="name">Affiliate cost</span><br/><span class="val" id="vAffSeg">10 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(8.3%)</span></span></span></div>
+            <div class="ex-label" id="lblAdsA" style="bottom:calc(10% - 14px)"><span class="swatch ads"></span><span><span class="name">Ads cost</span><br/><span class="val" id="vAdsSeg">24 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(20%)</span></span></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="target-row">
+        <span class="target-chip aff">Affiliate Inclusive ROI2 <b>3.33</b></span>
+      </div>
+    </div>
+
+    <div class="receipt reveal delay-4" id="receipt">
+      <div class="row" data-key="gmv">
+        <div class="k"><span>GMV</span><span class="delta up" id="dGmv">+20%</span></div>
+        <div class="vals"><span class="from" id="fGmv">100</span><span class="to" id="vGmv">100</span></div>
+        <div class="progress"><div class="fill" id="pGmv"></div></div>
+      </div>
+      <div class="row" data-key="cost">
+        <div class="k"><span>Total cost</span><span class="delta flat" id="dCost">in step</span></div>
+        <div class="vals"><span class="from" id="fCost">30</span><span class="to" id="vCost">30</span></div>
+        <div class="progress"><div class="fill" id="pCost"></div></div>
+      </div>
+      <div class="row highlight" data-key="profit">
+        <div class="k"><span>Net profit margin</span><span class="delta up" id="dProfit">+2 pts</span></div>
+        <div class="vals"><span class="from" id="fProfit">70%</span><span class="to" id="vProfit">70%</span></div>
+        <div class="progress"><div class="fill" id="pProfit"></div></div>
+      </div>
+    </div>
+
+    <p class="reveal delay-4" style="margin-top:18px;color:var(--ink-mute);font-size:13px">Numbers are illustrative. Real lift varies by shop, creator mix and category. Front end Target ROI2 input is untouched.</p>
+  </div>
+</section>
+
+<!-- 6. WHAT CHANGES FOR THE SELLER -->
+<section>
+  <div class="wrap">
+    <div class="sec-num reveal">05 / WHAT CHANGES FOR THE SELLER</div>
+    <h2 class="reveal delay-1">Nothing for you to change.<br/><span class="grad">The system just gets smarter underneath.</span></h2>
+    <p class="lead reveal delay-2">Same campaign. Same Target ROI input. Same creators and contracts. The system just picks differently behind the scenes.</p>
+
+    <div class="vs reveal delay-3" style="margin-top:30px">
+      <div class="col">
+        <h4>Stays the same</h4>
+        <ul>
+          <li><span class="ico y">✓</span><span>Existing Product GMV Max campaign</span></li>
+          <li><span class="ico y">✓</span><span>Same Target ROI input in Ads Manager</span></li>
+          <li><span class="ico y">✓</span><span>Same products, same budget, same creative workflow</span></li>
+          <li><span class="ico y">✓</span><span>Affiliate program and commission contracts untouched</span></li>
+        </ul>
+      </div>
+      <div class="col next">
+        <h4>What ACO does</h4>
+        <ul>
+          <li><span class="ico y">✓</span><span>Ranks creatives on what's left after both Ads cost and Affiliate commission — not just Ads cost.</span></li>
+          <li><span class="ico y">✓</span><span>When two creatives drive similar GMV, the cheaper one wins traffic.</span></li>
+          <li><span class="ico y">✓</span><span>High-commission creatives still win when they clearly drive more GMV.</span></li>
+          <li><span class="ico y">✓</span><span>You keep the same GMV (or more) while paying less in total cost.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="bar"></div>
+  <div>Affiliate Cost Optimization · GMV Max Pro · SEA</div>
+  <div style="margin-top:6px">Internal Privileged &amp; Confidential</div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // Scene 1: reveal the small leader-line label for the tiny affiliate slice on Creator B
+  const stackA = document.getElementById('stackA');
+  const affLeaderB = document.getElementById('affLeaderB');
+  const blindIO = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        setTimeout(() => {
+          if (affLeaderB) affLeaderB.classList.add('show');
+        }, 500);
+        blindIO.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.45 });
+  if (stackA) blindIO.observe(stackA);
+
+  // Scene 3: side-by-side columns. Left always GMV. Right toggles GMV <-> Profit.
+  // Each column reorders independently via top:Npx animation.
+  const listLeft = document.getElementById('listLeft');
+  const listRight = document.getElementById('listRight');
+  const colRight = document.getElementById('colRight');
+  const rightTitle = document.getElementById('rightTitle');
+  const rightSignal = document.getElementById('rightSignal');
+  const activeName = document.getElementById('activeName');
+  const rankToggleEl = document.getElementById('rankToggle');
+  const rankSwitch = document.getElementById('rankSwitch');
+  const lblBefore = document.getElementById('lblBefore');
+  const lblAfter = document.getElementById('lblAfter');
+
+  // Underlying ranking values per signal. Higher wins.
+  // GPM (raw): A 100, B 88, Self 78. Order: A → B → Self.
+  // GPM after commission: A=$100×(1−25%)=$75, B=$88×(1−8%)=$81, Self=$78×(1−0%)=$78. Order: B → Self → A.
+  const signalValues = {
+    gmv:    { A: 100, B: 88, S: 78 },
+    profit: { A: 75,  B: 81, S: 78 }
+  };
+  const signalDisplay = {
+    gmv:    { A: '$100', B: '$88', S: '$78' },
+    profit: { A: '$75',  B: '$81', S: '$78' }
+  };
+  const signalFillPct = {
+    gmv:    { A: 100, B: 88, S: 78 },
+    profit: { A: 75,  B: 81, S: 78 }
+  };
+
+  function layoutColumn(listEl, mode, prevOrder) {
+    const cards = Array.from(listEl.querySelectorAll('.crt'));
+    if (!cards.length) return [];
+    // Card heights are fixed via CSS per column type; use those constants so the math
+    // is correct even when the column is hidden / not yet measured.
+    const col = listEl.closest('.rank-col');
+    const cardH = 200;
+    const gap = 14;
+    const ids = cards.map(c => c.dataset.id).sort((a, b) => signalValues[mode][b] - signalValues[mode][a]);
+    listEl.style.height = (ids.length * cardH + (ids.length - 1) * gap) + 'px';
+
+    ids.forEach((id, idx) => {
+      const card = listEl.querySelector('.crt[data-id="' + id + '"]');
+      card.style.top = (idx * (cardH + gap)) + 'px';
+      const pos = card.querySelector('.pos');
+      if (pos) pos.textContent = idx + 1;
+      card.classList.toggle('win', idx === 0);
+
+      const arrow = card.querySelector('.arrow');
+      if (arrow && prevOrder) {
+        const prevIdx = prevOrder.indexOf(id);
+        arrow.classList.remove('up', 'down', 'flat');
+        arrow.textContent = '';
+        if (prevIdx !== -1 && prevIdx !== idx) {
+          if (prevIdx > idx) { arrow.textContent = '▲'; arrow.classList.add('up'); }
+          else { arrow.textContent = '▼'; arrow.classList.add('down'); }
+        }
+      } else if (arrow) {
+        arrow.classList.remove('up', 'down', 'flat');
+        arrow.textContent = '';
+      }
+    });
+    return ids;
+  }
+
+  function updateRightSignals(mode) {
+    const data = signalDisplay[mode];
+    const fills = signalFillPct[mode];
+    ['A', 'B', 'S'].forEach(id => {
+      const nameEl = document.getElementById('r' + id + '-name');
+      const valEl = document.getElementById('r' + id + '-val');
+      const fillEl = document.getElementById('r' + id + '-fill');
+      if (nameEl) nameEl.textContent = mode === 'gmv' ? 'GPM' : 'GPM after commission';
+      if (valEl) valEl.textContent = data[id];
+      if (fillEl) fillEl.style.width = fills[id] + '%';
+    });
+  }
+
+  // Initial layout: both columns by GMV
+  layoutColumn(listLeft, 'gmv');
+  let rightCurrentMode = 'gmv';
+  let rightPrevOrder = layoutColumn(listRight, 'gmv');
+
+  function setRightMode(mode) {
+    if (mode === rightCurrentMode) return;
+    const prevOrder = rightPrevOrder;
+    // 1. Show/hide the right column with side-by-side animation
+    const rankGrid = document.getElementById('rankGrid');
+    if (mode === 'profit') {
+      rankGrid.classList.add('aco-on');
+      // Snap right column back to GMV order (matching left) without animation,
+      // so cards visually start where left ends, then animate into profit order.
+      const cards = listRight.querySelectorAll('.crt');
+      cards.forEach(c => c.style.transition = 'none');
+      rightPrevOrder = layoutColumn(listRight, 'gmv');
+      // Force reflow then restore transitions
+      void listRight.offsetHeight;
+      cards.forEach(c => { c.style.transition = ''; });
+    } else {
+      rankGrid.classList.remove('aco-on');
+    }
+    // 2. Update signal labels and fills (so users see the criterion change)
+    colRight.classList.toggle('is-gmv', mode === 'gmv');
+    colRight.classList.toggle('is-profit', mode === 'profit');
+    colRight.classList.toggle('live-after', mode === 'profit');
+    rightTitle.textContent = mode === 'gmv' ? 'Same column · GPM' : 'After · with ACO';
+    rightSignal.textContent = mode === 'gmv' ? 'GPM' : 'GPM after commission';
+    activeName.textContent = mode === 'gmv' ? 'GPM' : 'GPM after commission';
+    updateRightSignals(mode);
+
+    // 3. Toggle visual state of the slider
+    if (mode === 'profit') {
+      rankToggleEl.classList.add('on');
+      rankSwitch.setAttribute('aria-checked', 'true');
+      lblBefore.classList.remove('active');
+      lblAfter.classList.add('active');
+    } else {
+      rankToggleEl.classList.remove('on');
+      rankSwitch.setAttribute('aria-checked', 'false');
+      lblBefore.classList.add('active');
+      lblAfter.classList.remove('active');
+    }
+
+    // 4. Reorder cards after the right column has slid in
+    setTimeout(() => {
+      // For profit mode, prevOrder is the freshly-snapped GMV order so arrows compute correctly.
+      const fromOrder = mode === 'profit' ? rightPrevOrder : prevOrder;
+      rightPrevOrder = layoutColumn(listRight, mode, fromOrder);
+      rightCurrentMode = mode;
+    }, mode === 'profit' ? 1400 : 700);
+  }
+
+  rankSwitch.addEventListener('click', () => {
+    setRightMode(rightCurrentMode === 'gmv' ? 'profit' : 'gmv');
+  });
+  rankSwitch.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); rankSwitch.click(); }
+  });
+  // also allow clicking labels
+  lblBefore.addEventListener('click', () => setRightMode('gmv'));
+  lblAfter.addEventListener('click', () => setRightMode('profit'));
+
+  // Auto-flip disabled. User drives the toggle.
+
+  // Scene 4: Before pane is always visible. After pane reveals on toggle.
+  // Receipt values switch with the toggle.
+  const exShell = document.getElementById('exShell');
+  const exTitle = document.getElementById('exTitle');
+
+  const acoToggleEl = document.getElementById('acoToggle');
+  const acoSwitch = document.getElementById('acoSwitch');
+  const acoLblBefore = document.getElementById('acoLblBefore');
+  const acoLblAfter = document.getElementById('acoLblAfter');
+  const punchNum = document.getElementById('punchNum');
+  const vGmv = document.getElementById('vGmv');
+  const vCost = document.getElementById('vCost');
+  const vProfit = document.getElementById('vProfit');
+  const pGmv = document.getElementById('pGmv');
+  const pCost = document.getElementById('pCost');
+  const pProfit = document.getElementById('pProfit');
+  const fGmv = document.getElementById('fGmv');
+  const fCost = document.getElementById('fCost');
+  const fProfit = document.getElementById('fProfit');
+  const dGmv = document.getElementById('dGmv');
+  const dCost = document.getElementById('dCost');
+  const dProfit = document.getElementById('dProfit');
+
+  let acoTickRaf = null;
+  function applyAcoState(state) {
+    if (acoTickRaf) cancelAnimationFrame(acoTickRaf);
+    if (state === 'before') {
+      acoToggleEl.classList.remove('on');
+      acoSwitch.setAttribute('aria-checked', 'false');
+      acoLblBefore.classList.add('active');
+      acoLblAfter.classList.remove('active');
+      exShell.classList.remove('aco-on');
+      exTitle.textContent = 'Today · ranks on GMV signal';
+
+      // Receipt: Before-only values, no deltas, no progress
+      punchNum.textContent = '+0';
+      vGmv.textContent = '100';
+      vCost.textContent = '30';
+      vProfit.textContent = '70%';
+      pGmv.style.width = '0%';
+      pCost.style.width = '0%';
+      pProfit.style.width = '0%';
+      fGmv.classList.remove('show'); fCost.classList.remove('show'); fProfit.classList.remove('show');
+      dGmv.classList.remove('show'); dCost.classList.remove('show'); dProfit.classList.remove('show');
+    } else {
+      acoToggleEl.classList.add('on');
+      acoSwitch.setAttribute('aria-checked', 'true');
+      acoLblBefore.classList.remove('active');
+      acoLblAfter.classList.add('active');
+      exShell.classList.add('aco-on');
+      exTitle.textContent = 'With ACO · ranks on Affiliate Inclusive ROI2';
+
+      // Tick the receipt and punchline up
+      const start = performance.now();
+      const dur = 1500;
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / dur);
+        const e = 1 - Math.pow(1 - t, 3);
+        const v = 2 * e;
+        punchNum.textContent = '+' + (v < 1.95 ? v.toFixed(1) : '2');
+        vGmv.textContent = (100 + 20 * e).toFixed(0);
+        vCost.textContent = (30 + 4 * e).toFixed(0);
+        vProfit.textContent = (70 + 2 * e).toFixed(0) + '%';
+        if (t < 1) acoTickRaf = requestAnimationFrame(tick);
+        else punchNum.textContent = '+2';
+      };
+      acoTickRaf = requestAnimationFrame(tick);
+
+      // Show the from-values + deltas + progress fills after a beat
+      setTimeout(() => {
+        fGmv.classList.add('show'); fCost.classList.add('show'); fProfit.classList.add('show');
+        dGmv.classList.add('show'); dCost.classList.add('show'); dProfit.classList.add('show');
+        pGmv.style.width = '60%';
+        pCost.style.width = '30%';
+        pProfit.style.width = '90%';
+      }, 300);
+    }
+  }
+
+  // Initial: Before. No auto-flip.
+  applyAcoState('before');
+
+  acoSwitch.addEventListener('click', () => {
+    applyAcoState(acoToggleEl.classList.contains('on') ? 'before' : 'after');
+  });
+  acoSwitch.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); acoSwitch.click(); }
+  });
+  acoLblBefore.addEventListener('click', () => applyAcoState('before'));
+  acoLblAfter.addEventListener('click', () => applyAcoState('after'));
+</script>
+
+</body>
+</html>
