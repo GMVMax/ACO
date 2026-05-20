@@ -124,12 +124,12 @@
   .slide-toggle .lbl.active{color:#fff}
   .slide-toggle .lbl.left.active{color:#fff}
   .slide-toggle .lbl.right.active{color:var(--tt-cyan)}
-  .slide-toggle .switch{position:relative;width:78px;height:38px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--line);cursor:pointer;transition:background .4s, border-color .4s, box-shadow .4s;flex-shrink:0;animation:togglePulse 3.2s ease-in-out infinite}
-  .slide-toggle .switch::before{content:"";position:absolute;top:3px;left:3px;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.45);transition:transform .35s cubic-bezier(.4,1.4,.6,1), background .35s, box-shadow .35s;animation:knobPulse 3.2s ease-in-out infinite}
+  .slide-toggle .switch{position:relative;width:78px;height:38px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--line);cursor:pointer;transition:background .4s, border-color .4s, box-shadow .4s;flex-shrink:0;animation:togglePulse 7s cubic-bezier(.4,0,.2,1) infinite}
+  .slide-toggle .switch::before{content:"";position:absolute;top:3px;left:3px;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.45);transition:transform .35s cubic-bezier(.4,1.4,.6,1), background .35s, box-shadow .35s;animation:knobPulse 7s cubic-bezier(.4,0,.2,1) infinite}
   .slide-toggle.on .switch{background:rgba(37,244,238,0.12);border-color:rgba(37,244,238,0.4);box-shadow:none;animation:none}
   .slide-toggle.on .switch::before{transform:translateX(40px);background:#fff;box-shadow:0 0 14px rgba(37,244,238,0.55), 0 0 28px rgba(37,244,238,0.2);animation:none}
-  @keyframes togglePulse{0%,100%{box-shadow:0 0 0 0 rgba(37,244,238,0.22)}50%{box-shadow:0 0 0 4px rgba(37,244,238,0)}}
-  @keyframes knobPulse{0%,100%{box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 0 0 0 rgba(37,244,238,0.22)}50%{box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 0 6px 2px rgba(37,244,238,0.18)}}
+  @keyframes togglePulse{0%,100%{box-shadow:0 0 0 0 rgba(37,244,238,0)}50%{box-shadow:0 0 0 8px rgba(37,244,238,0.22)}}
+  @keyframes knobPulse{0%,100%{box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 0 0 0 rgba(37,244,238,0)}50%{box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 0 14px 4px rgba(37,244,238,0.16)}}
   .slide-toggle .key{font-size:11px;color:var(--ink-mute);font-weight:600;letter-spacing:0.16em;text-transform:uppercase}
 
   .signal-banner{margin-top:24px;padding:14px 18px;border:1px dashed var(--line);border-radius:12px;background:var(--card);font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -321,7 +321,7 @@
   <div class="wrap">
     <div class="reveal"><span class="pill"><span class="pulse"></span>GMV Max Pro · Affiliate Cost Optimisation · SEA</span></div>
     <h1 class="hero reveal delay-1" style="margin-top:14px">GMV is up.<br/><span class="grad">So why is profit flat?</span></h1>
-    <p class="lead reveal delay-2">Today's ranking sees Ads cost but not Affiliate commission, even though both come out of the seller's pocket. Affiliate Cost Optimization closes that blind spot — the system now optimizes for profit, not just GMV.</p>
+    <p class="lead reveal delay-2">Today's creative ranking on GMV Max sees Ads cost but not Affiliate commission, even though both come out of the seller's pocket. Affiliate Cost Optimization closes that blind spot — the system now optimizes for profit, not just GMV.</p>
   </div>
 </section>
 
@@ -385,7 +385,7 @@
   <div class="wrap">
     <div class="sec-num reveal">02 / THE MATH</div>
     <h2 class="reveal delay-1">From <span style="color:var(--tt-cyan)">ROI2</span> to <span class="grad">Affiliate Inclusive ROI2</span>.</h2>
-    <p class="lead reveal delay-2">Same numerator. Bigger denominator. The system now ranks on the full cost of the sale.</p>
+    <p class="lead reveal delay-2">The system now ranks on the full cost of the sale.</p>
 
     <div class="math-row reveal delay-3">
       <div class="formula-box before">
@@ -417,7 +417,7 @@
   <div class="wrap">
     <div class="sec-num reveal">03 / HOW RANKING CHANGES</div>
     <h2 class="reveal delay-1">Creative Ranking in ACO.<br/><span class="grad">The order changes once commission is in the math.</span></h2>
-    <p class="lead reveal delay-2">Today, ranking uses GPM alone (GMV per 1,000 impressions). Slide the toggle to bring in the ACO column — it ranks on GPM after commission.</p>
+    <p class="lead reveal delay-2">Default ranks creatives on GPM. ACO ranks them on GPM net of commission.</p>
 
     <div class="reveal delay-3" style="margin-top:30px">
       <div class="slide-toggle" id="rankToggle">
@@ -614,7 +614,7 @@
   <div class="wrap">
     <div class="sec-num reveal">05 / WHAT CHANGES FOR THE SELLER</div>
     <h2 class="reveal delay-1">Nothing for you to change.<br/><span class="grad">The system just gets smarter underneath.</span></h2>
-    <p class="lead reveal delay-2">Same campaign. Same Target ROI input. Same creators and contracts. The system just picks differently behind the scenes.</p>
+    <p class="lead reveal delay-2">Nothing changes for you. Only what the auction picks changes.</p>
 
     <div class="vs reveal delay-3" style="margin-top:30px">
       <div class="col">
