@@ -175,12 +175,14 @@
   .crt .arrow.flat{color:var(--ink-mute);opacity:1}
 
   /* Single signal bar inside each card. Color depends on column type. */
-  .sig{transition:opacity 1.2s}
+  .sig{transition:opacity .5s ease}
+  .sig.morphing{opacity:0.3}
   .sig .head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
-  .sig .head .name{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;color:var(--ink-soft)}
-  .sig .head .val{font-size:13px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+  .sig .head .name{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;color:var(--ink-soft);transition:opacity .4s ease}
+  .sig .head .val{font-size:13px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;transition:opacity .4s ease}
+  .sig.text-out .head .name,.sig.text-out .head .val{opacity:0}
   .sig .track{height:7px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden;position:relative}
-  .sig .fill{height:100%;border-radius:6px;transition:width 2s cubic-bezier(.2,.7,.2,1)}
+  .sig .fill{height:100%;border-radius:6px;transition:width 1s cubic-bezier(.2,.7,.2,1), background .6s ease, box-shadow .6s ease}
   .rank-col.is-gmv .sig .fill{background:linear-gradient(90deg,#00d68f,#25f4ee);box-shadow:0 0 10px rgba(0,214,143,0.35)}
   .rank-col.is-profit .sig .fill{background:linear-gradient(90deg,#fe2c55,#a78bfa);box-shadow:0 0 10px rgba(254,44,85,0.35)}
   /* Ghost signal: shown only in profit mode for the right column. Greyed-out reference of the old GMV signal. */
@@ -757,50 +759,76 @@
   function setRightMode(mode) {
     if (mode === rightCurrentMode) return;
     const prevOrder = rightPrevOrder;
-    // 1. Show/hide the right column with side-by-side animation
     const rankGrid = document.getElementById('rankGrid');
+    const sigEls = listRight.querySelectorAll('.sig');
+
     if (mode === 'profit') {
+      // 1. Reveal right column with side-by-side animation
       rankGrid.classList.add('aco-on');
-      // Snap right column back to GMV order (matching left) without animation,
-      // so cards visually start where left ends, then animate into profit order.
+      // Snap right column to GMV order (matching left) without animation
       const cards = listRight.querySelectorAll('.crt');
       cards.forEach(c => c.style.transition = 'none');
       rightPrevOrder = layoutColumn(listRight, 'gmv');
-      // Force reflow then restore transitions
       void listRight.offsetHeight;
       cards.forEach(c => { c.style.transition = ''; });
-    } else {
-      rankGrid.classList.remove('aco-on');
-    }
-    // 2. Update signal labels and fills (so users see the criterion change)
-    colRight.classList.toggle('is-gmv', mode === 'gmv');
-    colRight.classList.toggle('is-profit', mode === 'profit');
-    colRight.classList.toggle('live-after', mode === 'profit');
-    rightTitle.textContent = mode === 'gmv' ? 'Same column · GPM' : 'After · with ACO';
-    rightSignal.textContent = mode === 'gmv' ? 'GPM' : 'GPM after commission';
-    activeName.textContent = mode === 'gmv' ? 'GPM' : 'GPM after commission';
-    updateRightSignals(mode);
 
-    // 3. Toggle visual state of the slider
-    if (mode === 'profit') {
+      // Toggle visual state of slider
       rankToggleEl.classList.add('on');
       rankSwitch.setAttribute('aria-checked', 'true');
       lblBefore.classList.remove('active');
       lblAfter.classList.add('active');
+
+      // Header labels can flip immediately
+      rightTitle.textContent = 'After · with ACO';
+      activeName.textContent = 'GPM after commission';
+
+      // ---- BEAT 1 (1500–2000ms): fade out current signal text & dim bar (after column has slid in)
+      setTimeout(() => {
+        sigEls.forEach(s => { s.classList.add('morphing'); s.classList.add('text-out'); });
+      }, 1500);
+
+      // ---- BEAT 2 (2000ms): swap class, update bar values, fade text back in
+      setTimeout(() => {
+        colRight.classList.remove('is-gmv');
+        colRight.classList.add('is-profit');
+        colRight.classList.add('live-after');
+        rightSignal.textContent = 'GPM after commission';
+        updateRightSignals('profit');
+        // remove text-out → new values + new "GPM after commission" label fade in
+        sigEls.forEach(s => s.classList.remove('text-out'));
+        // remove morphing slightly later so bar comes back to full opacity once color/width have started morphing
+        setTimeout(() => { sigEls.forEach(s => s.classList.remove('morphing')); }, 400);
+      }, 2000);
+
+      // ---- BEAT 3 (after 1s pause at 3000ms → 4000ms): card reshuffle
+      setTimeout(() => {
+        rightPrevOrder = layoutColumn(listRight, 'profit', rightPrevOrder);
+        rightCurrentMode = 'profit';
+      }, 4000);
+
     } else {
+      // Toggle off: collapse right column, restore everything
+      rankGrid.classList.remove('aco-on');
       rankToggleEl.classList.remove('on');
       rankSwitch.setAttribute('aria-checked', 'false');
       lblBefore.classList.add('active');
       lblAfter.classList.remove('active');
-    }
 
-    // 4. Reorder cards after the right column has slid in
-    setTimeout(() => {
-      // For profit mode, prevOrder is the freshly-snapped GMV order so arrows compute correctly.
-      const fromOrder = mode === 'profit' ? rightPrevOrder : prevOrder;
-      rightPrevOrder = layoutColumn(listRight, mode, fromOrder);
-      rightCurrentMode = mode;
-    }, mode === 'profit' ? 1400 : 700);
+      colRight.classList.remove('is-profit');
+      colRight.classList.remove('live-after');
+      colRight.classList.add('is-gmv');
+      rightTitle.textContent = 'Same column · GPM';
+      rightSignal.textContent = 'GPM';
+      activeName.textContent = 'GPM';
+      updateRightSignals('gmv');
+      // make sure morph classes are clean
+      sigEls.forEach(s => { s.classList.remove('morphing'); s.classList.remove('text-out'); });
+
+      setTimeout(() => {
+        rightPrevOrder = layoutColumn(listRight, 'gmv', prevOrder);
+        rightCurrentMode = 'gmv';
+      }, 700);
+    }
   }
 
   rankSwitch.addEventListener('click', () => {
