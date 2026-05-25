@@ -124,13 +124,20 @@
   .slide-toggle .lbl.active{color:#fff}
   .slide-toggle .lbl.left.active{color:#fff}
   .slide-toggle .lbl.right.active{color:var(--tt-cyan)}
-  .slide-toggle .switch{position:relative;width:78px;height:38px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--line);cursor:pointer;transition:background .4s, border-color .4s, box-shadow .4s;flex-shrink:0;animation:togglePulse 7s cubic-bezier(.4,0,.2,1) infinite}
-  .slide-toggle .switch::before{content:"";position:absolute;top:3px;left:3px;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.45);transition:transform .35s cubic-bezier(.4,1.4,.6,1), background .35s, box-shadow .35s;animation:knobPulse 7s cubic-bezier(.4,0,.2,1) infinite}
-  .slide-toggle.on .switch{background:rgba(37,244,238,0.12);border-color:rgba(37,244,238,0.4);box-shadow:none;animation:none}
-  .slide-toggle.on .switch::before{transform:translateX(40px);background:#fff;box-shadow:0 0 14px rgba(37,244,238,0.55), 0 0 28px rgba(37,244,238,0.2);animation:none}
-  @keyframes togglePulse{0%,100%{box-shadow:0 0 0 0 rgba(37,244,238,0)}50%{box-shadow:0 0 0 8px rgba(37,244,238,0.22)}}
-  @keyframes knobPulse{0%,100%{box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 0 0 0 rgba(37,244,238,0)}50%{box-shadow:0 4px 14px rgba(0,0,0,0.45), 0 0 14px 4px rgba(37,244,238,0.16)}}
+  .slide-toggle .switch{position:relative;width:78px;height:38px;border-radius:999px;background:rgba(255,255,255,0.06);border:1px solid var(--line);cursor:pointer;transition:background .4s, border-color .4s, box-shadow .4s;flex-shrink:0;overflow:hidden}
+  .slide-toggle .switch::before{content:"";position:absolute;top:3px;left:3px;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,0.45);transition:transform .35s cubic-bezier(.4,1.4,.6,1), background .35s, box-shadow .35s;z-index:2}
+  .slide-toggle .switch::after{content:"";position:absolute;top:0;left:0;width:60%;height:100%;border-radius:999px;background:linear-gradient(90deg, rgba(37,244,238,0) 0%, rgba(37,244,238,0.65) 50%, rgba(37,244,238,0) 100%);animation:toggleSweep 4.5s cubic-bezier(.4,0,.2,1) infinite;pointer-events:none;z-index:1;mix-blend-mode:screen;transform:translateX(-100%)}
+  .slide-toggle.on .switch{background:rgba(37,244,238,0.12);border-color:rgba(37,244,238,0.4);box-shadow:none}
+  .slide-toggle.on .switch::before{transform:translateX(40px);background:#fff;box-shadow:0 0 14px rgba(37,244,238,0.55), 0 0 28px rgba(37,244,238,0.2)}
+  .slide-toggle.on .switch::after{animation:none;opacity:0}
+  @keyframes toggleSweep{0%{transform:translateX(-100%)}55%{transform:translateX(170%)}100%{transform:translateX(170%)}}
   .slide-toggle .key{font-size:11px;color:var(--ink-mute);font-weight:600;letter-spacing:0.16em;text-transform:uppercase}
+
+  /* Glossary abbr tooltip — custom hover bubble, no native title delay */
+  abbr.gloss{position:relative;text-decoration:underline dotted rgba(255,255,255,0.45);text-underline-offset:3px;cursor:default;font-weight:inherit;color:inherit}
+  abbr.gloss::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 8px);transform:translateX(-50%) translateY(4px);background:rgba(15,15,20,0.96);color:#fff;font-size:12px;font-weight:500;line-height:1.4;letter-spacing:0;text-transform:none;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);box-shadow:0 8px 24px rgba(0,0,0,0.5);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;z-index:50}
+  abbr.gloss::before{content:"";position:absolute;left:50%;bottom:calc(100% + 2px);transform:translateX(-50%) translateY(4px);border:6px solid transparent;border-top-color:rgba(15,15,20,0.96);opacity:0;pointer-events:none;transition:opacity .18s ease, transform .18s ease;z-index:50}
+  abbr.gloss:hover::after,abbr.gloss:hover::before{opacity:1;transform:translateX(-50%) translateY(0)}
 
   .signal-banner{margin-top:24px;padding:14px 18px;border:1px dashed var(--line);border-radius:12px;background:var(--card);font-size:13px;color:var(--ink-soft);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
   .signal-banner .lit-dot{width:10px;height:10px;border-radius:50%;background:var(--good);box-shadow:0 0 12px var(--good);flex-shrink:0}
@@ -221,20 +228,21 @@
   .ex-shell{margin-top:36px;padding:36px 28px 32px;border:1px solid var(--line);border-radius:20px;background:var(--card);transition:border-color .6s, background .6s}
   .ex-shell.aco-on{border-color:rgba(0,214,143,0.4);background:linear-gradient(180deg,rgba(0,214,143,0.04),rgba(37,244,238,0.04))}
   .ex-shell .ex-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:18px;margin-bottom:22px}
+  .ex-shell .chip-cluster{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .ex-shell .stage-title{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);font-weight:800}
 
   /* Two-stack layout: Before always present. After hidden until toggle on. */
   .ex-stage{display:flex;justify-content:center;align-items:flex-start;gap:0;padding:18px 8px 8px}
   @media (max-width:880px){.ex-stage{flex-direction:column;align-items:center}}
 
-  .ex-pane{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;width:100%;max-width:440px;flex-shrink:0}
+  .ex-pane{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;width:100%;max-width:440px;flex-shrink:0;padding-top:60px}
   @media (max-width:1080px){.ex-pane{grid-template-columns:auto 1fr;gap:20px;max-width:340px}}
   .ex-pane .pane-title{grid-column:1 / -1;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink-mute);font-weight:800;text-align:center;margin-bottom:8px}
   /* Before pane stays centered when alone; slides left smoothly when After comes in. */
   .ex-pane.before{transition:transform .8s cubic-bezier(.25,.8,.25,1)}
   .ex-shell.aco-on .ex-pane.before{transform:translateX(0)}
   /* After pane: width animates from 0 to natural width. Inner content fades in slightly delayed. */
-  .ex-pane.after{max-width:0;width:0;overflow:hidden;opacity:0;margin-left:0;transition:max-width .8s cubic-bezier(.25,.8,.25,1), width .8s cubic-bezier(.25,.8,.25,1), margin-left .8s cubic-bezier(.25,.8,.25,1), opacity .5s ease;pointer-events:none}
+  .ex-pane.after{max-width:0;width:0;overflow-x:hidden;overflow-y:visible;opacity:0;margin-left:0;transition:max-width .8s cubic-bezier(.25,.8,.25,1), width .8s cubic-bezier(.25,.8,.25,1), margin-left .8s cubic-bezier(.25,.8,.25,1), opacity .5s ease;pointer-events:none}
   .ex-shell.aco-on .ex-pane.after{max-width:440px;width:100%;margin-left:32px;opacity:1;pointer-events:auto;transition:max-width .8s cubic-bezier(.25,.8,.25,1), width .8s cubic-bezier(.25,.8,.25,1), margin-left .8s cubic-bezier(.25,.8,.25,1), opacity .5s ease .25s}
   @media (max-width:1080px){.ex-shell.aco-on .ex-pane.after{max-width:340px}}
   @media (max-width:880px){.ex-shell.aco-on .ex-pane.after{margin-left:0;margin-top:24px}}
@@ -323,7 +331,7 @@
   <div class="wrap">
     <div class="reveal"><span class="pill"><span class="pulse"></span>GMV Max Pro · Affiliate Cost Optimisation · SEA</span></div>
     <h1 class="hero reveal delay-1" style="margin-top:14px">GMV is up.<br/><span class="grad">So why is profit flat?</span></h1>
-    <p class="lead reveal delay-2">Today's creative ranking on GMV Max sees Ads cost but not Affiliate commission, even though both come out of the seller's pocket. Affiliate Cost Optimization closes that blind spot — the system now optimizes for profit, not just GMV.</p>
+    <p class="lead reveal delay-2">Today's creative ranking on GMV Max sees Ads cost but not Affiliate commission, even though both come out of the seller's pocket. Affiliate Cost Optimization helps GMV Max consider estimated affiliate commission cost during delivery, so campaigns can pursue GMV growth with better overall cost efficiency.</p>
   </div>
 </section>
 
@@ -386,7 +394,7 @@
 <section>
   <div class="wrap">
     <div class="sec-num reveal">02 / THE MATH</div>
-    <h2 class="reveal delay-1">From <span style="color:var(--tt-cyan)">ROI2</span> to <span class="grad">Affiliate Inclusive ROI2</span>.</h2>
+    <h2 class="reveal delay-1">From <span style="color:var(--tt-cyan)">ROI2</span> to <span class="grad">Affiliate-Inclusive ROI3</span>.</h2>
     <p class="lead reveal delay-2">The system now ranks on the full cost of the sale.</p>
 
     <div class="math-row reveal delay-3">
@@ -403,7 +411,7 @@
       <div class="arrow">→</div>
       <div class="formula-box after">
         <div class="h">With ACO</div>
-        <div class="name">Affiliate Inclusive ROI2</div>
+        <div class="name">Affiliate-Inclusive ROI3</div>
         <div class="eq">
           <span class="num">GMV</span>
           <span style="opacity:.5"> &nbsp;÷&nbsp; </span>
@@ -419,7 +427,8 @@
   <div class="wrap">
     <div class="sec-num reveal">03 / HOW RANKING CHANGES</div>
     <h2 class="reveal delay-1">Creative Ranking in ACO.<br/><span class="grad">The order changes once commission is in the math.</span></h2>
-    <p class="lead reveal delay-2">Default ranks creatives on GPM. ACO ranks them on GPM net of commission.</p>
+    <p class="lead reveal delay-2">Default ranks creatives mainly on <abbr class="gloss" data-tip="Gross Merchandise per Mille — GMV per 1,000 video views">GPM</abbr>. ACO ranks them on GPM net of commission.</p>
+    <p class="reveal delay-2" style="margin-top:6px;font-size:13px;font-style:italic;color:rgba(255,255,255,0.55)">For illustration only. GPM is used here as a simplified proxy for GMV efficiency. Actual delivery considers multiple signals.</p>
 
     <div class="reveal delay-3" style="margin-top:30px">
       <div class="slide-toggle" id="rankToggle">
@@ -526,12 +535,12 @@
 <section>
   <div class="wrap">
     <div class="sec-num reveal">04 / WORKED EXAMPLE</div>
-    <h2 class="reveal delay-1">Same Target ROI2. <span class="grad">More profit.</span></h2>
+    <h2 class="reveal delay-1">Same Target ROI2. <span class="grad">More net revenue after marketing costs.</span></h2>
 
     <div class="punch reveal delay-2" id="punchBlock">
       <div>
         <div class="num"><span id="punchNum">+0</span><span style="font-size:0.5em">pts</span></div>
-        <div class="lbl">Net profit margin lift<span class="sml">From 70% to 72% on the same Target ROI2 of 5</span></div>
+        <div class="lbl">Net revenue margin lift<span class="sml">From 70% to 72% on the same Target ROI2 of 5</span></div>
       </div>
     </div>
 
@@ -547,7 +556,10 @@
     <div class="ex-shell reveal delay-3" id="exShell">
       <div class="ex-head">
         <span class="stage-title" id="exTitle">Today · ranks on GMV signal</span>
-        <span class="target-chip">Target ROI2 stays at <b>5</b></span>
+        <div class="chip-cluster">
+          <span class="target-chip">Target ROI2 stays at <b>5</b></span>
+          <span class="target-chip aff">Affiliate-Inclusive ROI3 <b>3.33</b> <span class="chip-arrow">→</span> <b>3.53</b> <span class="chip-up">▲</span></span>
+        </div>
       </div>
 
       <div class="ex-stage">
@@ -561,7 +573,7 @@
             <div class="seg profit" style="bottom:30%;height:70%"></div>
           </div>
           <div class="ex-labels">
-            <div class="ex-label profit-row" style="bottom:calc(65% - 14px)"><span class="swatch profit"></span><span><span class="name">Profit</span><br/><span class="val">70 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(70%)</span></span></span></div>
+            <div class="ex-label profit-row" style="bottom:calc(65% - 14px)"><span class="swatch profit"></span><span><span class="name">Net revenue</span><br/><span class="val">70 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(70%)</span></span></span></div>
             <div class="ex-label" style="bottom:calc(25% - 14px)"><span class="swatch aff"></span><span><span class="name">Affiliate cost</span><br/><span class="val">10 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(10%)</span></span></span></div>
             <div class="ex-label" style="bottom:calc(10% - 14px)"><span class="swatch ads"></span><span><span class="name">Ads cost</span><br/><span class="val">20 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(20%)</span></span></span></div>
           </div>
@@ -577,15 +589,11 @@
             <div class="seg profit" style="bottom:28.3%;height:71.7%"></div>
           </div>
           <div class="ex-labels">
-            <div class="ex-label profit-row" id="lblProfitA" style="bottom:calc(64.2% - 14px)"><span class="swatch profit"></span><span><span class="name">Profit</span><br/><span class="val" id="vProfitSeg">86 <span style="font-size:0.7em;font-weight:700;color:#a4f0ce">(71.7%)</span></span></span></div>
+            <div class="ex-label profit-row" id="lblProfitA" style="bottom:calc(64.2% - 14px)"><span class="swatch profit"></span><span><span class="name">Net revenue</span><br/><span class="val" id="vProfitSeg">86 <span style="font-size:0.7em;font-weight:700;color:#a4f0ce">(71.7%)</span></span></span></div>
             <div class="ex-label" id="lblAffA" style="bottom:calc(24.2% - 14px)"><span class="swatch aff"></span><span><span class="name">Affiliate cost</span><br/><span class="val" id="vAffSeg">10 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(8.3%)</span></span></span></div>
             <div class="ex-label" id="lblAdsA" style="bottom:calc(10% - 14px)"><span class="swatch ads"></span><span><span class="name">Ads cost</span><br/><span class="val" id="vAdsSeg">24 <span style="font-size:0.7em;font-weight:700;color:var(--ink-soft)">(20%)</span></span></span></div>
           </div>
         </div>
-      </div>
-
-      <div class="target-row">
-        <span class="target-chip aff">Affiliate Inclusive ROI2 <b>3.33</b> <span class="chip-arrow">→</span> <b>3.53</b> <span class="chip-up">▲</span></span>
       </div>
     </div>
 
@@ -601,7 +609,7 @@
         <div class="progress"><div class="fill" id="pCost"></div></div>
       </div>
       <div class="row highlight" data-key="profit">
-        <div class="k"><span>Net profit margin</span><span class="delta up" id="dProfit">+2 pts</span></div>
+        <div class="k"><span>Net revenue margin</span><span class="delta up" id="dProfit">+2 pts</span></div>
         <div class="vals"><span class="from" id="fProfit">70%</span><span class="to" id="vProfit">70%</span></div>
         <div class="progress"><div class="fill" id="pProfit"></div></div>
       </div>
@@ -623,7 +631,7 @@
         <h4>Stays the same</h4>
         <ul>
           <li><span class="ico y">✓</span><span>Existing Product GMV Max campaign</span></li>
-          <li><span class="ico y">✓</span><span>Same Target ROI input in Ads Manager</span></li>
+          <li><span class="ico y">✓</span><span>Ads ROI2 input unchanged. Affiliate-Inclusive ROI3 is the new protected target.</span></li>
           <li><span class="ico y">✓</span><span>Same products, same budget, same creative workflow</span></li>
           <li><span class="ico y">✓</span><span>Affiliate program and commission contracts untouched</span></li>
         </ul>
@@ -634,7 +642,7 @@
           <li><span class="ico y">✓</span><span>Ranks creatives on what's left after both Ads cost and Affiliate commission — not just Ads cost.</span></li>
           <li><span class="ico y">✓</span><span>When two creatives drive similar GMV, the cheaper one wins traffic.</span></li>
           <li><span class="ico y">✓</span><span>High-commission creatives still win when they clearly drive more GMV.</span></li>
-          <li><span class="ico y">✓</span><span>You keep the same GMV (or more) while paying less in total cost.</span></li>
+          <li><span class="ico y">✓</span><span>Maintain or grow GMV while improving affiliate-inclusive efficiency.</span></li>
         </ul>
       </div>
     </div>
@@ -893,7 +901,7 @@
       acoLblBefore.classList.remove('active');
       acoLblAfter.classList.add('active');
       exShell.classList.add('aco-on');
-      exTitle.textContent = 'With ACO · ranks on Affiliate Inclusive ROI2';
+      exTitle.textContent = 'With ACO · ranks on Affiliate-Inclusive ROI3';
 
       // Tick the receipt and punchline up
       const start = performance.now();
